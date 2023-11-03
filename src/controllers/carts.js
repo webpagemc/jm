@@ -14,7 +14,7 @@ const cartsControllers = {
     
         res.send(`Carrito con id ${id}`)
     
-    }
+    },
 
 }
 

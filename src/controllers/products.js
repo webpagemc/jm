@@ -1,38 +1,59 @@
 import productModel from "../models/products.model.js";
+import productServices from "../services/products.js";
 
 const productsControllers = {
 
-    getProducts: async(req, res)=>{
+  getProducts: async (req, res) => {
+    try {
+      const allProducts = await productServices.getAll()
+      res.status(200).json(allProducts);
 
-        try {
+    } catch (error) { res.status(404).send("ERROR") }
+  },
 
-            const allProducts = await productModel.find();
-            res.status(200).json(allProducts);
-            
-        } catch (error) {
+  getOneProduct: async (req, res) => {
+    try {
 
-            res.status(404).send("ERROR");
-            
-        }
-    
-    },
+      const id = req.params.id;
+      const prod = await productServices.getOne(id)
+      res.status(200).send(prod);
 
-    getOneProduct:(req, res)=>{
+    } catch (error) { res.status(404).send("ERROR") }
+  },
 
-        const id =  req.params.id
+  addProduct: async (req, res) => {
+    try {
 
-        res.send("Obtener un producto")
+      const { body } = req;
+      const newProd = await productModel.create(body);
+      res.status(200).json({ producto: newProd, message: "producto agregado" });
 
-    },
+    } catch (error) { res.status(404).send("ERROR") }
+  },
 
-    addProduct:(req, res)=>{
+  deleteProduct: async (req, res) => {
+    try {
+      const id = req.params.id;
+      await productModel.findOneAndDelete({ _id: id });
 
-        const { body } = req;
-    
-        res.send(`<h1>${body.nombre}</h1> <h2>${body.precio}</h2>`)
-    
-    }
+      res.status(200).send({ message: "producto eliminado" });
 
-}
+    } catch (error) { res.status(404).send("ERROR") }
+  },
+
+  updateProduct: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const body = req.body;
+
+      const newPro = await productModel.findOneAndUpdate({ _id: id }, body);
+
+      res
+      .status(200)
+      .send({ message: "producto actualizado", product: newPro });
+
+    } catch (error) { res.status(404).send("ERROR") };
+  },
+};
 
 export default productsControllers;
